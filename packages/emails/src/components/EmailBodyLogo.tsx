@@ -1,12 +1,15 @@
-import { WEBAPP_URL } from "@calcom/lib/constants";
+import { COMPANY_NAME, WEBAPP_URL } from "@calcom/lib/constants";
 
 import RawHtml from "./RawHtml";
 import Row from "./Row";
 
+// ?v=2: Gmail's image proxy caches by URL and would keep serving the previous logo.
+export const EMAIL_LOGO_URL = `${WEBAPP_URL}/emails/logo.png?v=2`;
+
 const CommentIE = ({ html = "" }) => <RawHtml html={`<!--[if mso | IE]>${html}<![endif]-->`} />;
 
 const EmailBodyLogo = () => {
-  const image = `${WEBAPP_URL}/emails/logo.png`;
+  const image = EMAIL_LOGO_URL;
 
   return (
     <>
@@ -45,22 +48,22 @@ const EmailBodyLogo = () => {
                     wordBreak: "break-word",
                   }}>
                   <Row border="0" style={{ borderCollapse: "collapse", borderSpacing: "0px" }}>
-                    <td style={{ width: "89px" }}>
+                    <td style={{ width: "103px" }}>
                       <a href={WEBAPP_URL} target="_blank" rel="noreferrer">
                         <img
-                          height="19"
+                          height="24"
                           src={image}
                           style={{
                             border: "0",
                             display: "block",
                             outline: "none",
                             textDecoration: "none",
-                            height: "19px",
+                            height: "24px",
                             width: "100%",
                             fontSize: "13px",
                           }}
-                          width="89"
-                          alt=""
+                          width="103"
+                          alt={COMPANY_NAME}
                         />
                       </a>
                     </td>

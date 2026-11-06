@@ -297,26 +297,39 @@ class GoogleCalendarService implements Calendar {
       }
 
       if (event && event.id && event.hangoutLink) {
-        await calendar.events.patch({
-          // Update the same event but this time we know the hangout link
-          calendarId: selectedCalendar,
-          eventId: event.id || "",
-          requestBody: {
-            description: getRichDescription({
-              ...calEvent,
-              additionalInformation: { hangoutLink: event.hangoutLink },
-            }),
-            location: getLocation({
-              videoCallData: calEvent.videoCallData,
-              additionalInformation: {
-                ...calEvent.additionalInformation,
-                hangoutLink: event.hangoutLink,
-              },
-              location: calEvent.location,
-              uid: calEvent.uid,
-            }),
-          },
-        });
+        // The event and Meet link already exist here, so a failed cosmetic update must not fail the booking (#28834).
+        try {
+          await calendar.events.patch({
+            // Update the same event but this time we know the hangout link
+            calendarId: selectedCalendar,
+            eventId: event.id || "",
+            requestBody: {
+              description: getRichDescription({
+                ...calEvent,
+                additionalInformation: { hangoutLink: event.hangoutLink },
+              }),
+              location: getLocation({
+                videoCallData: calEvent.videoCallData,
+                additionalInformation: {
+                  ...calEvent.additionalInformation,
+                  hangoutLink: event.hangoutLink,
+                },
+                location: calEvent.location,
+                uid: calEvent.uid,
+              }),
+            },
+          });
+        } catch (error) {
+          this.log.error(
+            "Could not add the Meet link to the Google Calendar event description: ",
+            safeStringify({
+              message: error instanceof Error ? error.message : String(error),
+              eventId: event.id,
+              selectedCalendar,
+              credentialId,
+            })
+          );
+        }
       }
 
       return {
@@ -418,26 +431,38 @@ class GoogleCalendarService implements Calendar {
       });
 
       if (evt && evt.data.id && evt.data.hangoutLink && event.location === MeetLocationType) {
-        await calendar.events.patch({
-          // Update the same event but this time we know the hangout link
-          calendarId: selectedCalendar,
-          eventId: evt.data.id || "",
-          requestBody: {
-            description: getRichDescription({
-              ...event,
-              additionalInformation: { hangoutLink: evt.data.hangoutLink },
-            }),
-            location: getLocation({
-              videoCallData: event.videoCallData,
-              additionalInformation: {
-                ...event.additionalInformation,
-                hangoutLink: evt.data.hangoutLink,
-              },
-              location: event.location,
-              uid: event.uid,
-            }),
-          },
-        });
+        // Same as createEvent: the event is already updated, so this PATCH must not fail the reschedule (#28834).
+        try {
+          await calendar.events.patch({
+            // Update the same event but this time we know the hangout link
+            calendarId: selectedCalendar,
+            eventId: evt.data.id || "",
+            requestBody: {
+              description: getRichDescription({
+                ...event,
+                additionalInformation: { hangoutLink: evt.data.hangoutLink },
+              }),
+              location: getLocation({
+                videoCallData: event.videoCallData,
+                additionalInformation: {
+                  ...event.additionalInformation,
+                  hangoutLink: evt.data.hangoutLink,
+                },
+                location: event.location,
+                uid: event.uid,
+              }),
+            },
+          });
+        } catch (error) {
+          this.log.error(
+            "Could not add the Meet link to the updated Google Calendar event description: ",
+            safeStringify({
+              message: error instanceof Error ? error.message : String(error),
+              eventId: evt.data.id,
+              selectedCalendar,
+            })
+          );
+        }
         return {
           uid: "",
           ...evt.data,

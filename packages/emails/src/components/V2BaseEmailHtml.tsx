@@ -1,10 +1,11 @@
 /* eslint-disable @next/next/no-head-element */
+import { COMPANY_NAME } from "@calcom/lib/constants";
 import BaseTable from "./BaseTable";
-import EmailBodyLogo from "./EmailBodyLogo";
+import EmailBodyLogo, { EMAIL_LOGO_URL } from "./EmailBodyLogo";
 import EmailHead from "./EmailHead";
 import EmailScheduledBodyHeaderContent from "./EmailScheduledBodyHeaderContent";
 import EmailSchedulingBodyDivider from "./EmailSchedulingBodyDivider";
-import EmailSchedulingBodyHeader, { BodyHeadType } from "./EmailSchedulingBodyHeader";
+import EmailSchedulingBodyHeader, { type BodyHeadType } from "./EmailSchedulingBodyHeader";
 import RawHtml from "./RawHtml";
 import Row from "./Row";
 
@@ -39,10 +40,26 @@ export const V2BaseEmailHtml = (props: {
                   fontSize: "0px",
                   padding: "0px",
                   paddingTop: "40px",
+                  paddingBottom: "24px",
                   textAlign: "center",
                 }}>
                 <RawHtml
                   html={`<!--[if mso | IE]><table role="presentation" border="0" cellpadding="0" cellspacing="0"><tr></tr></table><![endif]-->`}
+                />
+                <img
+                  height="40"
+                  width="172"
+                  src={EMAIL_LOGO_URL}
+                  alt={COMPANY_NAME}
+                  style={{
+                    border: "0",
+                    display: "inline-block",
+                    outline: "none",
+                    textDecoration: "none",
+                    height: "40px",
+                    width: "172px",
+                    fontSize: "13px",
+                  }}
                 />
               </td>
             </Row>

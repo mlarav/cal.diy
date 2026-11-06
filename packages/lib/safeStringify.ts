@@ -1,3 +1,7 @@
+// Gaxios errors carry the OAuth bearer token in their request headers: it must never reach the logs.
+const redactAuthorization = (key: string, value: unknown) =>
+  key.toLowerCase() === "authorization" ? "[REDACTED]" : value;
+
 /**
  * It stringifies the object which is necessary to ensure that in a logging system(like Axiom) we see the object in context in a single log event
  */
@@ -9,7 +13,7 @@ export function safeStringify(obj: unknown) {
       return JSON.stringify(obj.stack ?? obj.message);
     }
     // Avoid crashing on circular references
-    return JSON.stringify(obj);
+    return JSON.stringify(obj, redactAuthorization);
   } catch (e) {
     return obj;
   }
