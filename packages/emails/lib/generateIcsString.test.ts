@@ -68,7 +68,7 @@ describe("generateIcsString", () => {
     // ics folds long lines, so unfold before reading the ORGANIZER address.
     const organizerEmail = (icsString: string | undefined) =>
       assertHasIcsString(icsString)
-        .replace(/\r\n /g, "")
+        .replace(/\r\n[ \t]/g, "")
         .match(/^ORGANIZER.*mailto:(.+)$/m)?.[1];
 
     test("uses the event's reply-to address", () => {
