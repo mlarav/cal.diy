@@ -1,6 +1,6 @@
 /* eslint-disable @next/next/no-head-element */
 import BaseTable from "./BaseTable";
-import EmailBodyLogo from "./EmailBodyLogo";
+import EmailBodyLogo, { EmailHeaderLogo } from "./EmailBodyLogo";
 import EmailHead from "./EmailHead";
 import EmailScheduledBodyHeaderContent from "./EmailScheduledBodyHeaderContent";
 import EmailSchedulingBodyDivider from "./EmailSchedulingBodyDivider";
@@ -41,11 +41,13 @@ export const BaseEmailHtml = (props: {
                   fontSize: "0px",
                   padding: "0px",
                   paddingTop: "40px",
+                  paddingBottom: props.hideLogo ? "0px" : "24px",
                   textAlign: "center",
                 }}>
                 <RawHtml
                   html={`<!--[if mso | IE]><table role="presentation" border="0" cellpadding="0" cellspacing="0"><tr></tr></table><![endif]-->`}
                 />
+                {!props.hideLogo && <EmailHeaderLogo />}
               </td>
             </Row>
           </div>

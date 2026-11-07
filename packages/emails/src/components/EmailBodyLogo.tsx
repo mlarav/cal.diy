@@ -6,6 +6,24 @@ import Row from "./Row";
 // ?v=2: Gmail's image proxy caches by URL and would keep serving the previous logo.
 export const EMAIL_LOGO_URL = `${WEBAPP_URL}/emails/logo.png?v=2`;
 
+export const EmailHeaderLogo = () => (
+  <img
+    height="40"
+    width="172"
+    src={EMAIL_LOGO_URL}
+    alt={COMPANY_NAME}
+    style={{
+      border: "0",
+      display: "inline-block",
+      outline: "none",
+      textDecoration: "none",
+      height: "40px",
+      width: "172px",
+      fontSize: "13px",
+    }}
+  />
+);
+
 const CommentIE = ({ html = "" }) => <RawHtml html={`<!--[if mso | IE]>${html}<![endif]-->`} />;
 
 const EmailBodyLogo = () => {
