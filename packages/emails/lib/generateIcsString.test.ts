@@ -1,4 +1,4 @@
-import { describe, expect, vi } from "vitest";
+import { afterEach, describe, expect, vi } from "vitest";
 
 import { ORGANIZER_EMAIL_EXEMPT_DOMAINS } from "@calcom/lib/constants";
 import { ErrorCode } from "@calcom/lib/errorCodes";
@@ -60,6 +60,41 @@ const testIcsStringContains = ({
 };
 
 describe("generateIcsString", () => {
+  describe("hidden organizer email", () => {
+    afterEach(() => {
+      vi.unstubAllEnvs();
+    });
+
+    // ics folds long lines, so unfold before reading the ORGANIZER address.
+    const organizerEmail = (icsString: string | undefined) =>
+      assertHasIcsString(icsString)
+        .replace(/\r\n /g, "")
+        .match(/^ORGANIZER.*mailto:(.+)$/m)?.[1];
+
+    test("uses the event's reply-to address", () => {
+      vi.stubEnv("EMAIL_FROM", "agenda@example.com");
+      const event = buildCalendarEvent({
+        iCalSequence: 0,
+        attendees: [buildPerson()],
+        hideOrganizerEmail: true,
+        customReplyToEmail: "support@example.com",
+      });
+
+      expect(organizerEmail(generateIcsString({ event, status: "CONFIRMED" }))).toBe("support@example.com");
+    });
+
+    test("falls back to EMAIL_FROM without a reply-to address", () => {
+      vi.stubEnv("EMAIL_FROM", "agenda@example.com");
+      const event = buildCalendarEvent({
+        iCalSequence: 0,
+        attendees: [buildPerson()],
+        hideOrganizerEmail: true,
+      });
+
+      expect(organizerEmail(generateIcsString({ event, status: "CONFIRMED" }))).toBe("agenda@example.com");
+    });
+  });
+
   describe("booking actions", () => {
     test("when bookingAction is Create", () => {
       const event = buildCalendarEvent({

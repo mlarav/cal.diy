@@ -34,6 +34,7 @@ export type ICSCalendarEvent = Pick<
   | "type"
   | "hideCalendarEventDetails"
   | "hideOrganizerEmail"
+  | "customReplyToEmail"
 >;
 
 const toICalDateArray = (date: string): DateArray => {
@@ -84,7 +85,7 @@ const generateIcsString = ({
     organizer: {
       name: event.organizer.name,
       ...(event.hideOrganizerEmail && !isOrganizerExempt
-        ? { email: "no-reply@cal.com" }
+        ? { email: event.customReplyToEmail || process.env.EMAIL_FROM || "no-reply@cal.com" }
         : { email: event.organizer.email }),
     },
     ...{ recurrenceRule },

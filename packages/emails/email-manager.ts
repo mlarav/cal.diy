@@ -1,7 +1,6 @@
 import { default as cloneDeep } from "lodash/cloneDeep";
 import type { z } from "zod";
 
-import dayjs from "@calcom/dayjs";
 import type BaseEmail from "@calcom/emails/templates/_base-email";
 import type { EventNameObjectType } from "@calcom/features/eventtypes/lib/eventNaming";
 import { getEventName } from "@calcom/features/eventtypes/lib/eventNaming";
@@ -500,13 +499,13 @@ export const sendDeclinedEmailsAndSMS = async (
 
 export const sendCancelledEmailsAndSMS = async (
   calEvent: CalendarEvent,
-  eventNameObject: Pick<EventNameObjectType, "eventName">,
+  // Unused, kept so both callers stay identical to upstream and the fork merges cleanly.
+  _eventNameObject: Pick<EventNameObjectType, "eventName">,
   eventTypeMetadata?: EventTypeMetadata
 ) => {
   const calendarEvent = formatCalEvent(calEvent);
   const emailsToSend: Promise<unknown>[] = [];
   const calEventLength = calendarEvent.length;
-  const eventDuration = dayjs(calEvent.endTime).diff(calEvent.startTime, "minutes");
   const organizationSettings = await fetchOrganizationEmailSettings(calEvent.organizationId);
 
   if (typeof calEventLength !== "number") {
@@ -534,19 +533,8 @@ export const sendCancelledEmailsAndSMS = async (
         return sendEmail(
           () =>
             new AttendeeCancelledEmail(
-              {
-                ...calendarEvent,
-                title: getEventName({
-                  ...eventNameObject,
-                  t: attendee.language.translate,
-                  attendeeName: attendee.name,
-                  host: calendarEvent.organizer.name,
-                  eventType: calendarEvent.title,
-                  eventDuration,
-                  ...(calendarEvent.responses && { bookingFields: calendarEvent.responses }),
-                  ...(calendarEvent.location && { location: calendarEvent.location }),
-                }),
-              },
+              // calendarEvent.title is the booking's rendered title; getEventName would wrap it again.
+              calendarEvent,
               attendee
             )
         );
